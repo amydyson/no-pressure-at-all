@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
 import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
+import Patient from "./components/Patient";
 
 const client = generateClient<Schema>();
 
 function App() {
   const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
+  const [patients, setPatients] = useState<Array<Schema["Patient"]["type"]>>(
+    []
+  );
 
   useEffect(() => {
     client.models.Todo.observeQuery().subscribe({
@@ -13,8 +17,23 @@ function App() {
     });
   }, []);
 
+  useEffect(() => {
+    client.models.Patient.observeQuery().subscribe({
+      next: (data) => setPatients([...data.items]),
+    });
+  }, []);
+
   function createTodo() {
     client.models.Todo.create({ content: window.prompt("Todo content") });
+  }
+  function createPatient() {
+    client.models.Patient.create({
+      name: window.prompt("Patient name"),
+      dateOfBirth: window.prompt("Patient date of birth"),
+      weight: parseFloat(window.prompt("Patient weight") ?? "0"),
+      height: parseFloat(window.prompt("Patient height") ?? "0"),
+      bloodPressure: window.prompt("Patient blood pressure"),
+    });
   }
 
   function deleteTodo(id: string) {
@@ -23,8 +42,18 @@ function App() {
 
   return (
     <main>
+      <Patient />
       <h1>My todos</h1>
       <button onClick={createTodo}>+ new</button>
+      <button onClick={createPatient}>+ new</button>
+      <ul>
+        {patients.map((patient) => (
+          <li key={patient.id}>
+            {patient.name} - {patient.dateOfBirth} - {patient.weight} -{" "}
+            {patient.height} - {patient.bloodPressure}
+          </li>
+        ))}
+      </ul>
       <ul>
         {todos.map((todo) => (
           <li onClick={() => deleteTodo(todo.id)} key={todo.id}>

@@ -12,6 +12,15 @@ const schema = a.schema({
       content: a.string(),
     })
     .authorization((allow) => [allow.publicApiKey()]),
+  Patient: a
+    .model({
+      name: a.string(),
+      dateOfBirth: a.string(), // ISO date string
+      weight: a.float(),
+      height: a.float(),
+      bloodPressure: a.string(), // e.g., "120/80"
+    })
+    .authorization((allow) => [allow.publicApiKey()]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
