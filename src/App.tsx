@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import type { Schema } from "../amplify/data/resource";
+import { useAuthenticator } from "@aws-amplify/ui-react";
 import { generateClient } from "aws-amplify/data";
 import Patient from "./components/Patient";
 
 const client = generateClient<Schema>();
 
 function App() {
+  const { signOut } = useAuthenticator();
   const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
   const [patients, setPatients] = useState<Array<Schema["Patient"]["type"]>>(
     []
@@ -43,6 +45,7 @@ function App() {
   return (
     <main>
       <Patient />
+      <button onClick={signOut}>Sign out</button>
       <h1>My todos</h1>
       <button onClick={createTodo}>+ new</button>
       <button onClick={createPatient}>+ new</button>
